@@ -1,0 +1,31 @@
+{
+  "name": "CorrespondenceAnalysis",
+  "version": "0.0.1",
+  "description": "Correspondence analysis implementation in javascript, works on server-side and client-side.",
+  "main": "AC.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies" : {
+    "google-spreadsheets" : "*",
+    "sandcli" : "*",
+    "Array" : "git://github.com/piercus/Array.git#master",
+    "String" : "git://github.com/piercus/String.git#master",
+    "canvas" : "*",
+    "googleclientlogin" : "*"    
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/piercus/CorrespondenceAnalysis"
+  },
+  "keywords": [
+    "AFC",
+    "Correspondence",
+    "Analysis",
+    "stats",
+    "google",
+    "spreadsheets"
+  ],
+  "author": "Pierre Colle",
+  "license": "MIT"
+}
