@@ -1,8 +1,7 @@
 sand.define("CorrespondenceAnalysis/CorrespondenceAnalysis", [
-    "google-spreadsheets->ggss", 
+    "CorrespondenceAnalysis/ggss", 
     "numeric->numericjs", 
     "CorrespondenceAnalysis/canvasCtx", 
-    "googleclientlogin",
     "Array/map", 
     "Seed/Seed",  
     "Array/sum", 
@@ -20,8 +19,7 @@ Array.prototype.flatten = function(){
 
 var ggss = r.ggss,
     numericjs = r.numericjs,
-    Canvas = r.canvas,
-    GoogleClientLogin = r.googleclientlogin.GoogleClientLogin;
+    Canvas = r.canvas;
 
 
   var AC = r.Seed.extend({
@@ -29,21 +27,16 @@ var ggss = r.ggss,
       /*
        *  GGSS options object
        */
-      spreadSheetOptions : {
-        key : "0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE"
-      },
+      key : "0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE",
       googleLogin : {},
       dim : 2,
-      interval : [-1,1]
+      interval : [-1,1],
+      size : 2000,
+      font : '30px Impact'
     },
     
     "+init" : function(){
-      var googleAuth = new GoogleClientLogin(this.googleLogin);
-      googleAuth.on(GoogleClientLogin.events.login, function(){
-        this.spreadSheetOptions.auth = googleAuth.getAuthId();
-        ggss(this.spreadSheetOptions, this.onSpreadSheet.bind(this));
-      }.bind(this));
-      googleAuth.login();
+      r.ggss(this.key, this.onSpreadSheet.bind(this));
     },
     
     "findEigenValues" : function(a, cb){
@@ -67,10 +60,11 @@ var ggss = r.ggss,
       }
       
       
-      this.eig = numeric.eig(v_jj);
+      this.eig = numericjs.eig(v_jj);
+      console.log(this.eig);
       var inerties = this.eig.lambda.x.slice(1);
       var isum = inerties.sum();
-      //console.log(inerties.map(function(i){  return [Math.sqrt(i),i,i/isum]}));
+      console.log(inerties.map(function(i){  return [Math.sqrt(i),i,i/isum]}));
 
       
     },
@@ -87,7 +81,9 @@ var ggss = r.ggss,
           a_pj = u.mapMatrix(function(cell, p, j){return Math.sqrt(inerties[p])*cell/Math.sqrt(sumC[j])}),
           f_pi = [],
           mins = [], maxs = [], points = [], coords, max;
-          
+      
+      this.u_pj = u;   
+      
       for(var p = 0; p < dim ; p++){
         f_pi[p] = [];
         for(var i=0; i< p_ij.length; i++){
@@ -98,7 +94,7 @@ var ggss = r.ggss,
           f_pi[p][i] = 1/Math.sqrt(inerties[p])*tot;
         }
       }
-      
+      this.f_pi = f_pi;
       coords = numericjs.transpose(a_pj).concat(numericjs.transpose(f_pi));
       for(var p = 0; p < dim; p++){
         mins.push(coords.map(function(point){return point[p]}).min());
@@ -108,7 +104,7 @@ var ggss = r.ggss,
       max = mins.flatten().map(function(i){return Math.abs(i);}).concat(maxs.flatten()).max();
       
       for(var j = 0; j < a_pj[0].length; j++){
-        var po = {baseCoords : [], normCoords : []};
+        var po = {baseCoords : [], normCoords : [], color : "blue", col : true, population : this.sumC[j]};
         for(var p = 0; p < dim; p++){
           po.baseCoords.push(a_pj[p][j]);
           po.normCoords.push(a_pj[p][j]/max);
@@ -118,7 +114,7 @@ var ggss = r.ggss,
       }
       
       for(var i = 0; i < f_pi[0].length; i++){
-        var po = {baseCoords : [], normCoords : []};
+        var po = {baseCoords : [], normCoords : [], color : "red", population : this.sumR[i]};
         for(var p = 0; p < dim; p++){
           po.baseCoords.push(f_pi[p][i]);
           po.normCoords.push(f_pi[p][i]/max);
@@ -137,16 +133,14 @@ var ggss = r.ggss,
       //console.log("end");
     },
     
-    "onSpreadSheet" : function(err, spreadsheet){
+    "onSpreadSheet" : function(err, cells){
 
       if(err){
         console.log(err);
       }
-      spreadsheet.worksheets[0].cells({},function(err,cells){
-        this.formatSheet(err, cells);    
-        this.findEigenValues();  
-        this.draw(this.getPoints(), this.onEnd.bind(this));  
-      }.bind(this));
+      this.formatSheet(err, cells);    
+      this.findEigenValues();  
+      //this.draw(this.getPoints(), this.onEnd.bind(this));  
     },
     
     "formatSheet" : function(err, cells){
@@ -155,8 +149,8 @@ var ggss = r.ggss,
        for (var i in cells) if(cells.hasOwnProperty(i)){//stylesheets
         for (var j in cells[i]) if(cells[i].hasOwnProperty(j)){//rows
           for (var k in cells[i][j]) if(cells[i][j].hasOwnProperty(k)){//columns
-            var rIndex = parseInt(cells[i][j][k].row) - 2,
-                cIndex = parseInt(cells[i][j][k].col) - 2,
+            var rIndex = parseInt(cells[i][j][k].row) - 1,
+                cIndex = parseInt(cells[i][j][k].col) - 1,
                 v = parseInt(cells[i][j][k].inputValue);
                 
             
@@ -193,26 +187,28 @@ var ggss = r.ggss,
     },
     
     draw : function(points, cb){
-      var ctx = r.canvasCtx(); 
-                            
-      ctx.font = '30px Impact';
+      var size = this.size, ctx = r.canvasCtx(size, size); 
+                  
+      ctx.font = this.font;
       ctx.beginPath();
-      ctx.lineTo(1000, 0);
-      ctx.lineTo(1000, 2000);
+      ctx.textAlign = 'center';
+      ctx.lineTo(size/2, 0);
+      ctx.lineTo(size/2, size);
       ctx.stroke();
       ctx.beginPath();
-      ctx.lineTo(0, 1000);
-      ctx.lineTo(2000, 1000);
+      ctx.lineTo(0, size/2);
+      ctx.lineTo(size, size/2);
       ctx.stroke();
       //console.log("set Step");
-      var step = 1000;
+      var step = size/2*0.8;
       for(var i =0; i < points.length; i++){
-        var px = points[i].normCoords[0]*step+1000, py = points[i].normCoords[1]*(-1)*step+1000;
+        var px = points[i].normCoords[0]*step+size/2, py = points[i].normCoords[1]*(-1)*step+size/2;
+        ctx.fillStyle = points[i].color;
         ctx.fillText(points[i].label, px, py);
       }
     }
   });
-  new AC({});
+
   return AC;
 
 
