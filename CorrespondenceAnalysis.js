@@ -5,6 +5,7 @@ sand.define("CorrespondenceAnalysis/CorrespondenceAnalysis", [
     "Array/map", 
     "Seed/Seed",  
     "Array/sum", 
+    "Array/remove",
     "Array/max", 
     "Array/min",
     "Array/mapMatrix"
@@ -32,7 +33,8 @@ var ggss = r.ggss,
       dim : 2,
       interval : [-1,1],
       size : 2000,
-      font : '30px Impact'
+      callback : null,
+      remove : null
     },
     
     "+init" : function(){
@@ -61,12 +63,11 @@ var ggss = r.ggss,
       
       
       this.eig = numericjs.eig(v_jj);
-      console.log(this.eig);
+      //console.log(this.eig);
       var inerties = this.eig.lambda.x.slice(1);
       var isum = inerties.sum();
-      console.log(inerties.map(function(i){  return [Math.sqrt(i),i,i/isum]}));
-
-      
+      //console.log(inerties.map(function(i){  return [Math.sqrt(i),i,i/isum]}));
+      this.callback && this.callback();
     },
     
     getPoints : function(){
@@ -154,19 +155,42 @@ var ggss = r.ggss,
                 v = parseInt(cells[i][j][k].inputValue);
                 
             
-            if(!isNaN(v)) {
-              A[rIndex] || (A[rIndex] = []);
-              A[rIndex][cIndex] = v;
-            } else if(rIndex === -1 && cIndex !== -1) {
+            if(rIndex === -1 && cIndex !== -1) {
               cLegends.push(cells[i][j][k].inputValue);
             } else if(cIndex === -1 && rIndex !== -1) {
               rLegends.push(cells[i][j][k].inputValue);
-            }
+            } else if(!isNaN(v)) {
+              A[rIndex] || (A[rIndex] = []);
+              A[rIndex][cIndex] = v;
+            } 
           }
             
         }
       }
       
+      if(this.remove && this.remove.length > 0){
+         var index, removeCs = [], removeRs = [],diffR = 0, diffC = 0, newA = [];
+         for(var i = 0; i < this.remove.length; i++){
+           if((index = rLegends.indexOf(this.remove[i])) !== -1){
+             removeRs.push(index);
+             rLegends.remove(this.remove[i]);
+           }
+           if((index = cLegends.indexOf(this.remove[i])) !== -1){
+             removeCs.push(index);
+             cLegends.remove(this.remove[i]);
+           }          
+         }
+         A.mapMatrix(function(v,r,c){
+           if(removeCs.indexOf(c) !== -1 || removeRs.indexOf(r) !== -1) {
+             (removeCs.indexOf(c) !== -1) && (diffC++);
+             (removeRs.indexOf(c) !== -1) && (diffR++);          
+             return;
+           }
+           newA[r-diffR] || (newA[r-diffR] = []);
+           newA[r-diffR][c-diffC] = v;
+         });
+         A = newA;
+       }      
       if(A.length < A[0].length){
          A = numericjs.transpose(A);
          var tmp = rLegends;
