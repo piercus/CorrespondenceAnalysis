@@ -13,35 +13,144 @@
     <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Correspondenceanalysis</h1>
-        <p>Correspondence analysis implementation in javascript, works on server-side and client-side.</p>
+      <style>
 
-        <p class="view"><a href="https://github.com/piercus/CorrespondenceAnalysis">View the Project on GitHub <small>piercus/CorrespondenceAnalysis</small></a></p>
+    </style>
+    <div class="ribbon">
+  <a href="http://github.com/piercus/CorrespondenceAnalysis" rel="me">Fork me on GitHub</a>
+</div>
+<section>
+      <h1>Correspondence Analysis for Google Spreadsheets</h1>
+            <div class="input-container"><div class="left label">Google Spreadsheets Key</div><input id="spreadsheet-key" size="50" value="0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE" class= "left" onchange="onSheetLoaded"/><div style="clear:both;"></div></div>
 
-
+      <div style="height: 50px">
+        <div class="tabs chart" id="tabs">
         <ul>
-          <li><a href="https://github.com/piercus/CorrespondenceAnalysis/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/piercus/CorrespondenceAnalysis/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/piercus/CorrespondenceAnalysis">View On <strong>GitHub</strong></a></li>
+          <li class="tab tab-about"><a href="#" onclick="document.getElementById('tabs').className = 'tabs about';"><strong>About</strong></a></li>
+          <li class="tab tab-chart"><a href="#" onclick="document.getElementById('tabs').className = 'tabs chart';"><strong>Chart</strong></a></li>
+          <li class="tab tab-details"><a href="#" onclick="document.getElementById('tabs').className = 'tabs details';"><strong>Details</strong></a></a></li>
         </ul>
-      </header>
-      <section>
-        <h1>CorrespondenceAnalysis</h1>
+      
 
-<p>Correspondence analysis implementation in javascript, works on server-side and client-side.</p>
+      <div id="body-about" class="about body-tab">
+        This is a a demo of CorrespondenceAnalysis librairy. 
+        <ol>
+          <li>Make a google spreadsheet, just the first sheet will be used, format it with just 1st column of labels and 1st row of labels, (see the examples for help).</li>
+          <li>Make it public, (Share -> Public) and publish it on the web </li>
+          <li>Enter the url in the form below</li>                    
+        </ol>
+        
+        <strong>Or</strong> select one of the following examples
+        <ol>
+          <li><a href="#" onclick="document.getElementById('spreadsheet-key').value = '0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE'; onSheetLoaded();">Town/Level of studies in SwitzerLand</a>    (<a href="https://docs.google.com/spreadsheet/ccc?key=0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE" target="blank">see the spreadsheet</a>)</li>      
+          <li><a href="#" onclick="document.getElementById('spreadsheet-key').value = '0Aq0j0yzReyQcdHVURmtWc0x5Y2JyZ2YwSEdCTE9McWc'; onSheetLoaded();">24 European countries Uses comparaison between 2006 and 2009</a>     (<a href="https://docs.google.com/spreadsheet/ccc?key=0Aq0j0yzReyQcdHVURmtWc0x5Y2JyZ2YwSEdCTE9McWc" target="blank">see the spreadsheet</a>)</li> 
+          <li><a href="#" onclick="document.getElementById('spreadsheet-key').value = '0Aq0j0yzReyQcdF9VT3lpN25kOXprMUFoSnd3Zm1BTGc'; onSheetLoaded();">24 European countries Resources comparaison between 2006 and 2009</a>     (<a href="https://docs.google.com/spreadsheet/ccc?key=0Aq0j0yzReyQcdF9VT3lpN25kOXprMUFoSnd3Zm1BTGc" target="blank">see the spreadsheet</a>)</li>            
+        </ol>        
+      </div>
+      <div id="body-res" class="chart body-tab">
+          <div id="chart_div" style="width: 800px;height : 800px; margin : auto;"></div>
 
-<p>See a <a href="http://piercus.github.com/CorrespondenceAnalysis">demo</a></p>
+      </div>
+      <div id="body-details" class="details body-tab">
+         <div id="details"></div>
+      </div>
+      </div>
+    <script src="./CA.merged.js"></script>
+    
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script>
+      var AC, onSheetLoaded, chartsReady = false, changeMatrix, nonChecked = [];
+      sand.require("CorrespondenceAnalysis/CorrespondenceAnalysis", function(r){
 
-<h1>What is Correspondance Analysis</h1>
+          onSheetLoaded = function(){
+            AC = new r.CorrespondenceAnalysis({
+              key : document.getElementById("spreadsheet-key").value,
+              callback : drawChartAndTable,
+              remove : nonChecked
+            });
+          };
 
-<p>See <a href="http://en.wikipedia.org/wiki/Correspondence_analysis">http://en.wikipedia.org/wiki/Correspondence_analysis</a>.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/piercus">piercus</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+          var onChartReady = function(){
+            chartsReady = true;
+            drawChartAndTable();
+          };
+          
+          changeMatrix = function(){
+            var f = document.getElementById("details-form");
+            nonChecked = [];
+            Array.prototype.slice.call(f.elements).each(function(e){  !e.checked && (nonChecked.push(e.name)) });
+            onSheetLoaded();
+          };
+          
+          onSheetLoaded();
+          
+          google.load("visualization", "1", {packages:["corechart"]});
+          google.setOnLoadCallback(onChartReady);
+                    
+          function drawChartAndTable() {
+            if(!AC || !chartsReady) return;
+            document.getElementById('tabs').className = 'tabs chart';
+            var data = google.visualization.arrayToDataTable([
+              ['Lambda1', 'Lambda2']
+            ].concat());
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'ID');
+            dataTable.addColumn('number', 'Lambda1');
+
+            dataTable.addColumn('number', 'Lambda2');
+
+            dataTable.addColumn('string', 'Data Type');
+            
+            var points = AC.getPoints().map(function(p){
+              //console.log([p.normCoords[0]].concat(p.label).concat( p.col ? [p.normCoords[1], null] : [null, p.normCoords[1]]));
+              return [p.label, p.normCoords[0], p.normCoords[1], !p.col ?"Rows" : "Columns", p.population];
+            });
+            
+            // A column for custom tooltip content
+            dataTable.addColumn('number','Population');
+
+            var inerties = AC.eig.lambda.x.slice(1),
+                isum = inerties.sum(),
+                format = function(n){
+                  return parseFloat(Math.round(n * 1000) / 1000).toFixed(3);
+                },
+                getLegend = function(m, lgds, axisName){
+                  var table = [];
+                  console.log(nonChecked);
+                  m.mapMatrix(function(cell, p, j){ 
+                      table[j] || (table[j] = [], table[j].push("<input type='checkbox' checked='"+(nonChecked.indexOf(lgds[j]) === -1 ? "checked" : "")+"' name='"+lgds[j]+"'>"+lgds[j]));
+                      table[j][p+1] = format(cell);
+                  });
+                  return "<tr><th rowspan="+table.length+">"+axisName+"</th>"+table.map(function(t){return "<td>"+t.map(function(c){ return c.toString();}).join("</td><td>")+"</td>"; }).join("</tr><tr>")+"</tr>";
+              
+            };
+
+      //console.log(inerties.map(function(i){  return [Math.sqrt(i),i,i/isum]}));
+            var legends = "<form id='details-form'><table class='details-table'><tr><td colspan='2'><a href='#' onclick='changeMatrix()'>Reload</a></td><th class='details-th'>Lamdba1</th><th class='details-th'>Lambda2</th></tr>"
+              + "<tr><th rowspan='4'>Inertia</th><td>Singular Value</td><td>"+format(Math.sqrt(inerties[0]))+"</td><td>"+format(Math.sqrt(inerties[1]))+"</td></tr>"
+              + "<tr><td>Inertia</td><td>"+format(inerties[0])+"</td><td>"+format(inerties[1])+"</td></tr>"
+              + "<tr><td>Proportion Explained</td><td>"+format(inerties[0]/isum*100)+"%</td><td>"+format(inerties[1]/isum*100)+"%</td></tr>"      
+              + "<tr><td>Cumulative Proportion</td><td>"+format(inerties[0]/isum*100)+"%</td><td>"+format((inerties[0]+inerties[1])/isum*100)+"%</td></tr>"                          
+              + getLegend(AC.u_pj, AC.cLegends, "Studies")
+              + getLegend(AC.f_pi.mapMatrix(function(cell,p,i){return cell*Math.sqrt(AC.sumR[i]);}), AC.rLegends, "Town")+"</table></form>";
+
+            document.getElementById("details").innerHTML = legends;
+            var options = {
+              title: 'Correspondence Analysis',
+              bubble: {textStyle: {fontSize: 11}},
+              theme : 'maximized'
+            };
+            
+            dataTable.addRows(points);
+            
+            var chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+          }
+
+        
+        
+      });
+    </script>
     </div>
     <script src="javascripts/scale.fix.js"></script>
               <script type="text/javascript">
@@ -54,6 +163,7 @@
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
+          <div style="clear:both;"></div>
+</section>
   </body>
 </html>
