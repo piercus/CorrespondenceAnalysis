@@ -10,6 +10,8 @@ What is Correspondance Analysis
 
 See http://en.wikipedia.org/wiki/Correspondence_analysis.
 
+Or for a more step by step tutorial, see http://www.micheloud.com/FXM/COR/E/index.html
+
 Dependencies
 =====
 
