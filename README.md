@@ -19,7 +19,7 @@ sandjs, seedjs, sandcli, numericjs are used on both server-side and client-side.
 
 For client-side, the demo run with google-visualization.
 
-For server-side, it runs with "canvas" npm module
+For server-side, it runs with "canvas" npm module, so you need to install specific tools, to do that, follow the [Node-canvas Wiki](https://github.com/LearnBoost/node-canvas/wiki/_pages)
 
 Build
 ====

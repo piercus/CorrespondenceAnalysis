@@ -1,4 +1,4 @@
-sand.define("CorrespondenceAnalysis/ggss", ["Array/each", "Array/map"], function(r){
+define(["Array/each", "Array/map"], function(){
       
   return function(key, cb){
     var jsonpHandlerId = "jsonpHandler"+Math.floor(Math.random()*1000);
@@ -15,19 +15,24 @@ sand.define("CorrespondenceAnalysis/ggss", ["Array/each", "Array/map"], function
             colIndex = 0;
             key = (rowIndex+1).toString();
             cells[key] = {};
-            e.c.each(function(h){              
-                cells[key][(colIndex+1).toString()] = {inputValue : h.v, row : rowIndex, col : colIndex };
+            e.c.each(function(h,i){      
+                if(typeof(h) === "undefined"){
+                  console.log("Warning, no value on row "+rowIndex+" and column "+colIndex);
+                  //throw("cell content is undefined");
+                }        
+                cells[key][(colIndex+1).toString()] = {inputValue : (h && h.v) || "", row : rowIndex, col : colIndex };
                 colIndex++;              
             });
       });
       
       console.log(cells);
       cb(null, {"sheet1" : cells});
-    }
+    };
+
     var scp = document.createElement('script');
     scp.setAttribute("type","text/javascript");
     scp.setAttribute("src", URL);   
     document.getElementsByTagName("head")[0].appendChild(scp);  
-  }
+  };
 
 });

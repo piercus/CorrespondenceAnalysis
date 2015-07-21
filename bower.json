@@ -1,0 +1,26 @@
+{
+  "name": "CorrespondenceAnalysis",
+  "version": "0.0.0",
+  "homepage": "https://github.com/piercus/CorrespondenceAnalysis",
+  "authors": [
+    "Piercus <piercus@gmail.com>"
+  ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "google-sheets": "~1.0.4",
+    "numeric-1.2.6": "http://numericjs.com/numeric/lib/numeric-1.2.6.js",
+    "requirejs": "~2.1.19"
+  }
+}

@@ -1,140 +1,78 @@
+<!doctype html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Correspondenceanalysis by piercus</title>
+
+    <link rel="stylesheet" href="./app/styles/style.css">
+    <link rel="stylesheet" href="./app/styles/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
   <body>
-    <style>
-      .tabs .table, .tabs .chart, .tabs .details{
-        display : none;
-      }
-      .tabs.table .table {
-        display : block;
-      }
-      .tabs.chart .chart {
-        display : block;      
-      }
-      .tabs.details .details {
-        display : block;      
-      }      
-      .details-table td {
-        border : 1px solid black;
-        border-collapse : none;
-      }
-      table.content td {
-        border : none;
-        width: 50%;
-      }
-      table {
-        font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
-        width:100%;
-        border-collapse:collapse;
-      }
-      table.details-table > tr > td, table th {
-        font-size:1.2em;
-        border:1px solid #98bf21;
-        padding:3px 7px 2px 7px;
-      }
-      table.details-table th.details-th {
-        font-size:1.4em;
-        text-align:left;
-        padding-top:5px;
-        padding-bottom:4px;
-        background-color:#A7C942;
-        color:#fff;
-      }
-      table.details-table tr.alt td {
-        color:#000;
-        background-color:#EAF2D3;
-      }
+      <style>
     </style>
-    <div class="tabs chart" id="tabs">
-      <a href="#" onclick="document.getElementById('tabs').className = 'tabs chart';">chart</a>
-      <a href="#" onclick="document.getElementById('tabs').className = 'tabs table';">table</a>
-      <a href="#" onclick="document.getElementById('tabs').className = 'tabs details';">details</a>
-      <div id="body-table" class="table">
+    <div class="ribbon">
+  <a href="http://github.com/piercus/CorrespondenceAnalysis" rel="me">Fork me on GitHub</a>
+</div>
+<section>
+      <h1>Correspondence Analysis for Google Spreadsheets</h1>
+            <div class="input-container"><div class="left label">Google Spreadsheets Key</div><input id="spreadsheet-key" size="50" value="0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE" class= "left" onchange="onSheetLoaded"/><div style="clear:both;"></div></div>
+
+      <div style="height: 50px">
+        <div class="tabs chart" id="tabs">
+        <ul>
+          <li class="tab tab-about"><a href="#" onclick="document.getElementById('tabs').className = 'tabs about';"><strong>About</strong></a></li>
+          <li class="tab tab-chart"><a href="#" onclick="document.getElementById('tabs').className = 'tabs chart';"><strong>Chart</strong></a></li>
+          <li class="tab tab-details"><a href="#" onclick="document.getElementById('tabs').className = 'tabs details';"><strong>Details</strong></a></a></li>
+        </ul>
+      
+
+      <div id="body-about" class="about body-tab">
+        This is a a demo of CorrespondenceAnalysis librairy. 
+        <ol>
+          <li>Make a google spreadsheet, just the first sheet will be used, format it with just 1st column of labels and 1st row of labels, (see the examples for help).</li>
+          <li>Make it public, (Share -> Public) and publish it on the web </li>
+          <li>Enter the url in the form below</li>                    
+        </ol>
+        
+        <strong>Or</strong> select one of the following examples
+        <ol>
+          <li><a href="#" onclick="document.getElementById('spreadsheet-key').value = '0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE'; onSheetLoaded();">Town/Level of studies in SwitzerLand</a>    (<a href="https://docs.google.com/spreadsheet/ccc?key=0Aq0j0yzReyQcdDl2cEVYWWRXQ3IzOU1Sa3NkallLakE" target="blank">see the spreadsheet</a>)</li>      
+          <li><a href="#" onclick="document.getElementById('spreadsheet-key').value = '0Aq0j0yzReyQcdHVURmtWc0x5Y2JyZ2YwSEdCTE9McWc'; onSheetLoaded();">24 European countries Resources comparaison between 2006 and 2009</a>     (<a href="https://docs.google.com/spreadsheet/ccc?key=0Aq0j0yzReyQcdHVURmtWc0x5Y2JyZ2YwSEdCTE9McWc" target="blank">see the spreadsheet</a>)</li> 
+          <li><a href="#" onclick="document.getElementById('spreadsheet-key').value = '0Aq0j0yzReyQcdF9VT3lpN25kOXprMUFoSnd3Zm1BTGc'; onSheetLoaded();">24 European countries Uses comparaison between 2006 and 2009</a>     (<a href="https://docs.google.com/spreadsheet/ccc?key=0Aq0j0yzReyQcdF9VT3lpN25kOXprMUFoSnd3Zm1BTGc" target="blank">see the spreadsheet</a>)</li>            
+        </ol>        
       </div>
-      <div id="body-res" class="chart">
-          <div id="chart_div" style="width: 1300px; height: 800px;"></div>
+      <div id="body-res" class="chart body-tab">
+          <div id="chart_div" style="width: 800px;height : 800px; margin : auto;"></div>
 
       </div>
-      <div id="body-details" class="details">
+      <div id="body-details" class="details body-tab">
          <div id="details"></div>
       </div>
-    </div>
-    <script src="http://localhost:8899/require?query=CorrespondenceAnalysis/CorrespondenceAnalysis"></script>
+      </div>
+    <script type="text/javascript" src="./node_modules/requirejs/require.js" data-main="./app/scripts/index.js"></script>
     
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
-      var AC;
-      sand.require("CorrespondenceAnalysis/CorrespondenceAnalysis", function(r){
-          google.load("visualization", "1", {packages:["corechart", "table"]});
-          google.setOnLoadCallback(drawChartAndTable);
-          function drawChartAndTable() {
-            var data = google.visualization.arrayToDataTable([
-              ['Lambda1', 'Lambda2']
-            ].concat());
-            var dataTable = new google.visualization.DataTable();
-            dataTable.addColumn('string', 'ID');
-            dataTable.addColumn('number', 'Lambda1');
 
-            dataTable.addColumn('number', 'Lambda2');
-
-            dataTable.addColumn('string', 'Data Type');
-            
-            var points = AC.getPoints().map(function(p){
-              //console.log([p.normCoords[0]].concat(p.label).concat( p.col ? [p.normCoords[1], null] : [null, p.normCoords[1]]));
-              return [p.label, p.normCoords[0], p.normCoords[1], !p.col ?"Town" : "Profession", p.population];
-            });
-            
-            
-            // A column for custom tooltip content
-            dataTable.addColumn('number','Population');
-            
-            var getLegend = function(m, lgds){
-              var table = [];
-              return m.mapMatrix(function(cell, p, j){ 
-                  table[j] || (table[j] = [], table[j].push(lgds[j]));
-                  return {cell : cell, j : j, label : lgds[j]};
-                  
-              }).map(function(dim){
-                  return "<table class='content'><tr>"+dim.map(function(a){
-                      
-                      return "<tr><td>"+a.label+"</td><td>"+a.cell+"</td></tr>";
-                  }).join("")+"</table>";   
-              });
-            };
-            
-            var legends = "<table class='details-table'><tr><td></td><th class='details-th'>Lamdba1</th><th class='details-th'>Lambda2</th></tr><tr><td>Studies</td><td>"
-              + getLegend(AC.u_pj, AC.cLegends).join("</td><td>")
-              +"</td></tr><tr><td>Town</td><td>"
-              + getLegend(AC.f_pi.mapMatrix(function(cell,p,i){return cell*Math.sqrt(AC.sumR[i]);}), AC.rLegends).join("</td><td>")
-              +"</td></tr><table>";
-
-            document.getElementById("details").innerHTML = legends;
-            var options = {
-              title: 'Correspondence Analysis',
-              hAxis: {title: 'Lambda1', viewWindowMode: null},
-              vAxis: {title: 'Lambda2', viewWindowMode: null},
-              bubble: {textStyle: {fontSize: 11}}
-            };
-            
-            dataTable.addRows(points);
-
-
-
-            var chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
-            chart.draw(dataTable, options);
-            var iframe = document.createElement("iframe");
-            iframe.width = 2000;
-            iframe.height = 2000;
-            iframe.frameborder = 0;
-            iframe.scrolling = "no";
-            iframe.src = "https://spreadsheets.google.com/ccc?key="+AC.key+"&hl=en_GB&single=true&gid=0&output=html";
-            document.getElementById("body-table").appendChild(iframe);
-          }
-          AC = new r.CorrespondenceAnalysis({size : 500, font : '10px impact'});
-        
-        
-      });
     </script>
+    </div>
+    <script src="./app/scripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-38515395-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+          <div style="clear:both;"></div>
+</section>
   </body>
 </html>

@@ -1,18 +1,26 @@
 {
   "name": "CorrespondenceAnalysis",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Correspondence analysis implementation in javascript, works on server-side and client-side.",
-  "main": "AC.js",
+  "main": "app/scripts/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies" : {
-    "google-spreadsheets" : "*",
-    "sandcli" : "*",
-    "Array" : "git://github.com/piercus/Array.git#master",
-    "String" : "git://github.com/piercus/String.git#master",
-    "canvas" : "*",
-    "googleclientlogin" : "*"    
+  "dependencies": {
+    "Array": "git://github.com/piercus/Array.git#master",
+    "String": "git://github.com/piercus/String.git#master",
+    "bower": "^1.4.1",
+    "google-spreadsheets": "*",
+    "googleclientlogin": "*",
+    "grunt": "^0.4.5",
+    "grunt-bower-requirejs": "^2.0.0",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "requirejs": "*",
+    "seed-js": "0.0.6"
+  },
+  "optionalDependencies": {
+    "canvas": "*"
   },
   "repository": {
     "type": "git",
@@ -27,5 +35,10 @@
     "spreadsheets"
   ],
   "author": "Pierre Colle",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-requirejs": "^0.4.4"
+  }
 }
