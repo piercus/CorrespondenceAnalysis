@@ -9,29 +9,33 @@ requirejs.config({
     requirejs: "../../bower_components/requirejs/require",
     "canvas/canvasCtx" : "canvas/canvasCtx.browser"
   },
+  baseUrl : "../../../app/scripts",
   shim : {
     "numeric" : {exports:"numeric"}
   }
 });
 var AC, onSheetLoaded, chartsReady = false, changeMatrix, nonChecked = [];
-requirejs(["CA/CorrespondenceAnalysis"], function(CorrespondenceAnalysis){
+requirejs(["CA/Spreadsheet"], function(CorrespondenceAnalysis){
 
-  onSheetLoaded = function(){
-    console.log("sheet loaded");
-    AC = new CorrespondenceAnalysis({
-      key : document.getElementById("spreadsheet-key").value,
-      callback : drawChartAndTable,
-      remove : nonChecked
-    });
-  };
+
 
   var onChartReady = function(){
         console.log("chartsReady");
 
     chartsReady = true;
-    //drawChartAndTable();
+    drawChartAndTable();
   };
-  
+
+  onSheetLoaded = function(){
+    console.log("sheet loaded");
+    AC = new CorrespondenceAnalysis({
+      key : document.getElementById("spreadsheet-key").value,
+      remove : nonChecked
+    });
+
+    AC.on("ready",onChartReady,AC);
+  };
+
   changeMatrix = function(){
     var f = document.getElementById("details-form");
     nonChecked = [];
@@ -44,7 +48,7 @@ requirejs(["CA/CorrespondenceAnalysis"], function(CorrespondenceAnalysis){
   google.load("visualization", "1", {packages:["corechart"], callback : onChartReady});
 
   function drawChartAndTable() {
-    if(!AC || !chartsReady) return;
+    if(!AC || !AC.hasMatrix() || !chartsReady) return;
     document.getElementById('tabs').className = 'tabs chart';
     var data = google.visualization.arrayToDataTable([
       ['Lambda1', 'Lambda2']
@@ -61,7 +65,7 @@ requirejs(["CA/CorrespondenceAnalysis"], function(CorrespondenceAnalysis){
     
     // A column for custom tooltip content
     dataTable.addColumn('number','Population');
-    var inerties = AC.eig.lambda.x.slice(1),
+    var inerties = AC.findEigenValues().lambda.x.slice(1),
         isum = inerties.sum(),
         format = function(n){
           return parseFloat(Math.round(n * 1000) / 1000).toFixed(3);
@@ -82,8 +86,8 @@ requirejs(["CA/CorrespondenceAnalysis"], function(CorrespondenceAnalysis){
       + "<tr><td>Inertia</td><td>"+format(inerties[0])+"</td><td>"+format(inerties[1])+"</td></tr>"
       + "<tr><td>Proportion Explained</td><td>"+format(inerties[0]/isum*100)+"%</td><td>"+format(inerties[1]/isum*100)+"%</td></tr>"      
       + "<tr><td>Cumulative Proportion</td><td>"+format(inerties[0]/isum*100)+"%</td><td>"+format((inerties[0]+inerties[1])/isum*100)+"%</td></tr>"                          
-      + getLegend(AC.u_pj, AC.cLegends, "Studies")
-      + getLegend(AC.f_pi.mapMatrix(function(cell,p,i){return cell*Math.sqrt(AC.sumR[i]);}), AC.rLegends, "Town")+"</table></form>";
+      + getLegend(AC.getUpj(), AC.cLegends, "Studies")
+      + getLegend(AC.getFpi().mapMatrix(function(cell,p,i){return cell*Math.sqrt(AC.getTotals().sumR[i]);}), AC.rLegends, "Town")+"</table></form>";
     document.getElementById("details").innerHTML = legends;
     var options = {
       title: 'Correspondence Analysis',
