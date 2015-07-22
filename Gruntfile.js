@@ -37,7 +37,6 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [
     'jshint:beforeconcat', 
     'jshint:other',
-    'bowerRequirejs',
     'requirejs:compile'
     //'jshint:afterconcat',
     ]);
