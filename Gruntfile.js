@@ -13,7 +13,7 @@ module.exports = function(grunt) {
               baseUrl : "app/scripts",
               mainConfigFile: "app/scripts/config.requirejs.js",
               out: 'dist/CA.merged.js',  
-              name: "CA/CorrespondenceAnalysis",
+              name: "CA/Spreadsheet",
               optimize: "none"           
             }
           }

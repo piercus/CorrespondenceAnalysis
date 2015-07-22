@@ -100,7 +100,7 @@ define([
                   
         if(isNaN(cell/total)){
           if(cb){
-            cb("Problem with cell "+i+","+j+" : cell is "+cell+" total is "+total)
+            cb("Problem with cell "+i+","+j+" : cell is "+cell+" total is "+total);
           } else {
             throw("Problem with cell "+i+","+j+" : cell is "+cell+" total is "+total);
           }
@@ -137,7 +137,7 @@ define([
 
             if(isNaN(res)){
               if(cb){
-                cb("NaN value in eigen values function, computation stops")
+                cb("NaN value in eigen values function, computation stops");
               } else {
                 throw("NaN value in eigen values function, computation stops");
               }
@@ -176,7 +176,7 @@ define([
       for(p = 0; p < dim ; p++){
         f_pi[p] = [];
         for(i=0; i< p_ij.length; i++){
-          var tot = 0; 
+          tot = 0; 
           for(j = 1; j < p_ij[0].length; j++){
             tot += p_ij[i][j]/(sumR[i]/total)*a_pj[p][j];
           }

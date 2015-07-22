@@ -126,10 +126,10 @@ define([
 
                 "_getCache" : function(o){
                     if(o.cb){ 
-                        o.cb(this._cache[o.fnName].err, this._cache[o.fnName].result) 
+                        o.cb(this._cache[o.fnName].err, this._cache[o.fnName].result); 
                     } else {
                         if(o.err) {
-                            throw(this._cache[o.fnName].err)
+                            throw(this._cache[o.fnName].err);
                         }
                         return this._cache[o.fnName].result;
                     }
@@ -145,7 +145,7 @@ define([
                         arguments.length > 0 && 
                         (typeof(arguments[0]) !== "function" || arguments.length > 1)
                     ){
-                        throw("cached function do not take any argument other than one callback")
+                        throw("cached function do not take any argument other than one callback");
                     }
 
                     if(this._cache[key]){
@@ -164,7 +164,7 @@ define([
                         });
                     }.bind(this));
 
-                }
+                };
             }
         }
     ];
