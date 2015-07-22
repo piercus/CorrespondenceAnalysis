@@ -1,8 +1,6 @@
 define([
-    "seed-js/Seed",
-    "ggss/ggss", 
+    "CA/Base",
     "numeric", 
-    "canvas/canvasCtx", 
     "Array/map", 
     "Array/sum", 
     "Array/remove",
@@ -10,28 +8,33 @@ define([
     "Array/min",
     "Array/mapMatrix",
     "Array/flatten"
-  ], function(Seed, numericjs){
+  ], function(Base, numericjs){
 
   var isArray = function(u){
     return (typeof u === "object") && (typeof u.length === "number"); 
   };
 
-  var CACore = Seed.extend({
+  var CACore = Base.extend({
     "+options" : {
       dim : 2,
-      _cache : {}
+      _cache : {},
 //      interval : [-1,1],
 //      size : 2000,
-//      callback : null,
+      callback : null
 //      remove : null,
 //      initialized : false
     },
+
     "setMatrix" : function(A){
       this.__matrix = A;
       this.resetCache();
     },
 
-    "resetCache" : function(){
+    "hasMatrix" : function(A){
+      return !!this.__matrix;
+    },
+
+    /*"resetCache" : function(){
       
       this._cache = {};
 
@@ -44,20 +47,22 @@ define([
         err : o.err
       };
 
-      return o.cb ? o.cb(o.err, o.result) : o.result;
+      if(o.cb){
+        return o.cb(o.err, o.result);
+      } else {
+        if(o.err){
+          throw(o.err);
+        }
+        return o.result;
+      }
+
     },
 
     "getCache" : function(o){
       return o.cb ? o.cb(this._cache[o.fnName].err, this._cache[o.fnName].result) : this._cache[o.fnName].result;
-    },
+    },*/
 
-    "getTotals" : function(cb){
-      if(this._cache["getTotals"]){
-        return this.getCache({
-          fnName : "getTotals",
-          cb: cb
-        });
-      }
+    "getTotals:cached" : function(cb){
 
       if(typeof(this.__matrix) === "undefined"){
         return this.setCache({
@@ -65,47 +70,33 @@ define([
           err : "No Matrix, call setMatrix() before", 
           callback : cb,
           result : null
-        );
+        });
       }
 
       var sumR = this.__matrix.map(function(e){
             return e.sum();
           }),
-          sumC  = numericjs.transpose(A).map(function(e){
+          sumC  = numericjs.transpose(this.__matrix).map(function(e){
             return e.sum();
-          });
+          }),
+          res = {
+            sumR : sumR,
+            sumC : sumC,
+            total : sumR.sum()
+          };
 
-      return this.setCache({
-        fnName : "getTotals", 
-        err : null, 
-        callback : cb,
-        result : {
-          sumR : sumR,
-          sumC : sumC,
-          totals : sumR.sum()
-        }
-      );
+      return cb(null, res);
 
     },
 
-    "getPij" : function(cb){
-      if(this._cache["getPij"]){
-        return this.getCache({
-          fnName : "findEigenValues",
-          cb: cb
-        });
-      }
+    "getPij:cached" : function(cb){
 
       if(typeof(this.__matrix) === "undefined"){
-        return this.setCache({
-          fnName : "getPij", 
-          err : "No Matrix, call setMatrix() before", 
-          callback : cb,
-          result : null
-        );
+        return cb("No Matrix, call setMatrix() before");
       }
 
-      var p_ij = this.__matrix.mapMatrix(function(cell, i ,j){ 
+      var total = this.getTotals().total,
+          p_ij = this.__matrix.mapMatrix(function(cell, i ,j){ 
                   
         if(isNaN(cell/total)){
           if(cb){
@@ -118,32 +109,14 @@ define([
         return cell/total;
       });
 
+      return cb(null, p_ij);
 
-      return this.setCache({
-        fnName : "getPij", 
-        err : null, 
-        callback : cb,
-        result : p_ij
-      });
-
-    }
+    },
     
-    "findEigenValues" : function(cb){
-
-      if(this._cache["findEigenValues"]){
-        return this.getCache({
-          fnName : "findEigenValues",
-          cb: cb
-        });
-      }
+    "findEigenValues:cached" : function(cb){
 
       if(typeof(this.__matrix) === "undefined"){
-        return this.setCache({
-          fnName : "findEigenValues", 
-          err : "No Matrix, call setMatrix() before", 
-          callback : cb,
-          result : null
-        );
+        return cb("No Matrix, call setMatrix() before");
       }
       
       var a = this.__matrix,
@@ -179,25 +152,59 @@ define([
       
       var eig = numericjs.eig(v_jj);
 
-      var inerties = this.eig.lambda.x.slice(1);
+      var inerties = eig.lambda.x.slice(1);
       var isum = inerties.sum();
 
-      return this.setCache({
-        fnName : "findEigenValues", 
-        err : null, 
-        callback : cb,
-        result : eig
-      });
+      return cb(null, eig);
 
     },
-    
-    getPoints : function(cb){
 
-      if(this._cache["getPoints"]){
-        return this.getCache({
-          fnName : "getPoints",
-          cb: cb
-        });
+    "getFpi:cached" : function(cb){
+      var p,
+          dim = this.dim,
+          tot, 
+          f_pi = [],
+          p_ij = this.getPij(),
+          totals = this.getTotals(),
+          total = totals.total,
+          a_pj = this.getApj(),
+          sumC = totals.sumC,
+          eig = this.findEigenValues(),
+          inerties = eig.lambda.x.slice(1),
+          sumR = totals.sumR;
+
+      for(p = 0; p < dim ; p++){
+        f_pi[p] = [];
+        for(i=0; i< p_ij.length; i++){
+          var tot = 0; 
+          for(j = 1; j < p_ij[0].length; j++){
+            tot += p_ij[i][j]/(sumR[i]/total)*a_pj[p][j];
+          }
+          f_pi[p][i] = 1/Math.sqrt(inerties[p])*tot;
+        }
+      }
+
+      return cb(null, f_pi);
+    },
+
+    "getUpj:cached" : function(cb){
+      return cb(null, numeric.transpose(this.findEigenValues().E.x).slice(1,1+this.dim));
+    },
+
+    "getApj:cached" : function(cb){
+      var eig = this.findEigenValues(),
+          inerties = eig.lambda.x.slice(1),
+          sumC = this.getTotals().sumC;
+
+      return cb(null, this.getUpj().mapMatrix(function(cell, p, j){
+            return Math.sqrt(inerties[p])*cell/Math.sqrt(sumC[j]);
+          }));
+    },
+    
+    "getPoints:cached" : function(cb){
+
+      if(typeof(this.__matrix) === "undefined"){
+        return cb("No Matrix, call setMatrix() before");
       }
 
       var dim = this.dim,
@@ -208,14 +215,10 @@ define([
           p_ij = this.getPij(),
           eig = this.findEigenValues(),
           inerties = eig.lambda.x.slice(1),
-          u_pj = numeric.transpose(this.eig.E.x).slice(1,1+dim),
-          a_pj = u.mapMatrix(function(cell, p, j){
-            return Math.sqrt(inerties[p])*cell/Math.sqrt(sumC[j]);
-          });,
+          u_pj = this.getUpj(),
+          a_pj = this.getApj();
           
-      
-      
-      var f_pi = [],
+      var f_pi = this.getFpi(),
           mins = [], 
           maxs = [], 
           points = [], 
@@ -227,16 +230,7 @@ define([
           j,
           po;
       
-      for(p = 0; p < dim ; p++){
-        f_pi[p] = [];
-        for(i=0; i< p_ij.length; i++){
-          var tot = 0; 
-          for(j = 1; j < p_ij[0].length; j++){
-            tot += p_ij[i][j]/(sumR[i]/total)*a_pj[p][j];
-          }
-          f_pi[p][i] = 1/Math.sqrt(inerties[p])*tot;
-        }
-      }
+
       
       coords = numericjs.transpose(a_pj).concat(numericjs.transpose(f_pi));
       
@@ -254,7 +248,7 @@ define([
       max = mins.flatten().map(function(i){return Math.abs(i);}).concat(maxs.flatten()).max();
       
       for(j = 0; j < a_pj[0].length; j++){
-        po = {baseCoords : [], normCoords : [], color : "blue", col : true, population : this.sumC[j]};
+        po = {baseCoords : [], normCoords : [], color : "blue", col : true, population : sumC[j]};
         for(p = 0; p < dim; p++){
           po.baseCoords.push(a_pj[p][j]);
           po.normCoords.push(a_pj[p][j]/max);
@@ -264,7 +258,7 @@ define([
       }
       
       for(i = 0; i < f_pi[0].length; i++){
-        po = {baseCoords : [], normCoords : [], color : "red", population : this.sumR[i]};
+        po = {baseCoords : [], normCoords : [], color : "red", population : sumR[i]};
         for(p = 0; p < dim; p++){
           po.baseCoords.push(f_pi[p][i]);
           po.normCoords.push(f_pi[p][i]/max);
@@ -273,12 +267,7 @@ define([
         points.push(po);        
       }      
 
-      return this.setCache({
-        fnName : "getPoints", 
-        err : null, 
-        callback : cb,
-        result : points
-      });
+      return cb(null, points);
        
     }
     

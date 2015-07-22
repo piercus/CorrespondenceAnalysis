@@ -1,9 +1,10 @@
 define([
     "CA/Core",
-    "ggss/ggss"
-  ], function(Core, ggss){
+    "ggss/ggss",
+    "numeric"
+  ], function(Core, ggss, numericjs){
 
-  var AC = Seed.extend({
+  var AC = Core.extend({
     "+options" : {
       /*
        *  GGSS options object
@@ -24,6 +25,7 @@ define([
       }
       this.formatSheet(err, cells);    
       this.findEigenValues();  
+      this.fire("ready");
     },
     
     "formatSheet" : function(err, cells){
