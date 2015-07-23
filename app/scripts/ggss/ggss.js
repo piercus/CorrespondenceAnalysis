@@ -17,15 +17,14 @@ define(["Array/each", "Array/map"], function(){
             cells[key] = {};
             e.c.each(function(h,i){      
                 if(typeof(h) === "undefined"){
-                  console.log("Warning, no value on row "+rowIndex+" and column "+colIndex);
-                  //throw("cell content is undefined");
+                  throw("cell content is undefined");
                 }        
                 cells[key][(colIndex+1).toString()] = {inputValue : (h && h.v) || "", row : rowIndex, col : colIndex };
                 colIndex++;              
             });
       });
       
-      console.log(cells);
+      //console.log(cells);
       cb(null, {"sheet1" : cells});
     };
 

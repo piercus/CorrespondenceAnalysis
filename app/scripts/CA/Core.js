@@ -17,6 +17,7 @@ define([
   var CACore = Base.extend({
     "+options" : {
       dim : 2,
+      maxiter : 10000,
       _cache : {},
 //      interval : [-1,1],
 //      size : 2000,
@@ -34,43 +35,10 @@ define([
       return !!this.__matrix;
     },
 
-    /*"resetCache" : function(){
-      
-      this._cache = {};
-
-    },
-
-    "setCache" : function(o){
-      
-      this._cache[o.fnName] = {
-        result : o.result,
-        err : o.err
-      };
-
-      if(o.cb){
-        return o.cb(o.err, o.result);
-      } else {
-        if(o.err){
-          throw(o.err);
-        }
-        return o.result;
-      }
-
-    },
-
-    "getCache" : function(o){
-      return o.cb ? o.cb(this._cache[o.fnName].err, this._cache[o.fnName].result) : this._cache[o.fnName].result;
-    },*/
-
     "getTotals:cached" : function(cb){
 
       if(typeof(this.__matrix) === "undefined"){
-        return this.setCache({
-          fnName : "getTotals", 
-          err : "No Matrix, call setMatrix() before", 
-          callback : cb,
-          result : null
-        });
+        return cb("No Matrix, call setMatrix() before", res);
       }
 
       var sumR = this.__matrix.map(function(e){
@@ -84,6 +52,9 @@ define([
             sumC : sumC,
             total : sumR.sum()
           };
+      if(isNaN(res.total)){
+        cb("total is NaN");
+      }
 
       return cb(null, res);
 
@@ -149,9 +120,11 @@ define([
         }
       }
       
-      
-      var eig = numericjs.eig(v_jj);
-
+      try {
+        var eig = numericjs.eig(v_jj, this.maxiter);
+      } catch(e){
+        return cb(e);
+      }
       var inerties = eig.lambda.x.slice(1);
       var isum = inerties.sum();
 

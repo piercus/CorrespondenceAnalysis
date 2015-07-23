@@ -314,7 +314,7 @@ section ul {
 .tab:hover {
   background: #f4f6f7;
 }
-.tabs .table, .tabs .chart, .tabs .details, .tabs .about{
+.tabs .table, .tabs .chart, .tabs .details, .tabs .about, .tabs .debug {
   display : none;
   width:100%;
 }
@@ -327,14 +327,17 @@ section ul {
 .tabs.chart .chart {
   display : block;      
 }
-.tabs.chart .tab-chart, .tabs.table .tab-table, .tabs.details .tab-details, .tabs.about .tab-about {
+.tabs.chart .tab-chart, .tabs.table .tab-table, .tabs.details .tab-details, .tabs.about .tab-about, .tabs.debug .tab-debug {
   background: white;
   border-bottom: 3px solid white;
   box-shadow: none;
 }
 .tabs.details .details {
   display : block;      
-}      
+}    
+.tabs.debug .debug {
+  display : block;      
+}    
 .details-table td, .details-table th {
   border : 1px solid #dddddd;
   border-collapse : none;

@@ -25,9 +25,6 @@ module.exports = function(grunt) {
       }
   });
 
-
-
-
   // Load the plugin that provides jshit and requirejs
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
