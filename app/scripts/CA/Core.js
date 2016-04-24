@@ -1,17 +1,17 @@
 define([
     "CA/Base",
-    "numeric", 
-    "Array/map", 
-    "Array/sum", 
+    "numeric",
+    "Array/map",
+    "Array/sum",
     "Array/remove",
-    "Array/max", 
+    "Array/max",
     "Array/min",
     "Array/mapMatrix",
     "Array/flatten"
   ], function(Base, numericjs){
 
   var isArray = function(u){
-    return (typeof u === "object") && (typeof u.length === "number"); 
+    return (typeof u === "object") && (typeof u.length === "number");
   };
 
   var CACore = Base.extend({
@@ -67,8 +67,8 @@ define([
       }
 
       var total = this.getTotals().total,
-          p_ij = this.__matrix.mapMatrix(function(cell, i ,j){ 
-                  
+          p_ij = this.__matrix.mapMatrix(function(cell, i ,j){
+
         if(isNaN(cell/total)){
           if(cb){
             cb("Problem with cell "+i+","+j+" : cell is "+cell+" total is "+total);
@@ -83,13 +83,13 @@ define([
       return cb(null, p_ij);
 
     },
-    
+
     "findEigenValues:cached" : function(cb){
 
       if(typeof(this.__matrix) === "undefined"){
         return cb("No Matrix, call setMatrix() before");
       }
-      
+
       var a = this.__matrix,
           totals = this.getTotals(),
           total = totals.total,
@@ -97,7 +97,7 @@ define([
           sumR = totals.sumR,
           v_jj = [],
           p_ij = this.getPij();
-      
+
       for(var j1 = 0; j1 < a[0].length; j1++){
         v_jj[j1] = [];
         for(var j2 = 0; j2 < a[0].length; j2++){
@@ -119,7 +119,7 @@ define([
 
         }
       }
-      
+
       try {
         var eig = numericjs.eig(v_jj, this.maxiter);
       } catch(e){
@@ -135,7 +135,7 @@ define([
     "getFpi:cached" : function(cb){
       var p,
           dim = this.dim,
-          tot, 
+          tot,
           f_pi = [],
           p_ij = this.getPij(),
           totals = this.getTotals(),
@@ -149,7 +149,7 @@ define([
       for(p = 0; p < dim ; p++){
         f_pi[p] = [];
         for(i=0; i< p_ij.length; i++){
-          tot = 0; 
+          tot = 0;
           for(j = 1; j < p_ij[0].length; j++){
             tot += p_ij[i][j]/(sumR[i]/total)*a_pj[p][j];
           }
@@ -173,7 +173,7 @@ define([
             return Math.sqrt(inerties[p])*cell/Math.sqrt(sumC[j]);
           }));
     },
-    
+
     "getPoints:cached" : function(cb){
 
       if(typeof(this.__matrix) === "undefined"){
@@ -190,23 +190,23 @@ define([
           inerties = eig.lambda.x.slice(1),
           u_pj = this.getUpj(),
           a_pj = this.getApj();
-          
+
       var f_pi = this.getFpi(),
-          mins = [], 
-          maxs = [], 
-          points = [], 
-          coords, 
+          mins = [],
+          maxs = [],
+          points = [],
+          coords,
           max,
           //iterators
           p,
           i,
           j,
           po;
-      
 
-      
+
+
       coords = numericjs.transpose(a_pj).concat(numericjs.transpose(f_pi));
-      
+
       coords.getDim = function(p){
         return this.map(function(point){
           return point[p];
@@ -215,11 +215,11 @@ define([
 
       for(p = 0; p < dim; p++){
         mins.push(coords.getDim(p).min());
-        maxs.push(coords.getDim(p).max());      
+        maxs.push(coords.getDim(p).max());
       }
-      
+
       max = mins.flatten().map(function(i){return Math.abs(i);}).concat(maxs.flatten()).max();
-      
+
       for(j = 0; j < a_pj[0].length; j++){
         po = {baseCoords : [], normCoords : [], color : "blue", col : true, population : sumC[j]};
         for(p = 0; p < dim; p++){
@@ -229,7 +229,7 @@ define([
         }
         points.push(po);
       }
-      
+
       for(i = 0; i < f_pi[0].length; i++){
         po = {baseCoords : [], normCoords : [], color : "red", population : sumR[i]};
         for(p = 0; p < dim; p++){
@@ -237,14 +237,14 @@ define([
           po.normCoords.push(f_pi[p][i]/max);
           po.label = this.rLegends[i];
         }
-        points.push(po);        
-      }      
+        points.push(po);
+      }
 
       return cb(null, points);
-       
+
     }
-    
-    
+
+
   });
 
   return CACore;

@@ -51,17 +51,17 @@ define([
     var mergeFns = function(before, after) {
         if (typeof(before) === "function" || typeof(after) === "function") {
             return function(){
-                var beforeR = (typeof(before) === "function" ? 
-                        before.apply(this, arguments) : 
+                var beforeR = (typeof(before) === "function" ?
+                        before.apply(this, arguments) :
                         before
                     ),
-                    afterR  = (typeof(after) === "function" ? 
-                        after.apply(this, arguments) : 
+                    afterR  = (typeof(after) === "function" ?
+                        after.apply(this, arguments) :
                         after
                     );
 
                 return extendReturn(beforeR, afterR);
-            };    
+            };
         } else {
             return extendReturn(before, after);
         }
@@ -88,14 +88,14 @@ define([
         {
             match : /^(.*):cached/g,
             replace : "$1",
-            extend : { 
-                
+            extend : {
+
                 "+init" : function(){
                     this.resetCache();
                 },
 
                 "resetCache" : function(key){
-                    
+
                     if(!this._cache){
                         this._cache = {};
                     }
@@ -108,7 +108,6 @@ define([
                 },
 
                 "_setCache" : function(o){
-
                     this._cache[o.fnName] = {
                         result : o.result,
                         err : o.err
@@ -125,8 +124,8 @@ define([
                 },
 
                 "_getCache" : function(o){
-                    if(o.cb){ 
-                        o.cb(this._cache[o.fnName].err, this._cache[o.fnName].result); 
+                    if(o.cb){
+                        o.cb(this._cache[o.fnName].err, this._cache[o.fnName].result);
                     } else {
                         if(o.err) {
                             throw(this._cache[o.fnName].err);
@@ -136,13 +135,13 @@ define([
                 }
             },
             fn : function(extOptions){
-                
+
                 var key = extOptions.key, fn = extOptions.extFn;
 
                 return function(cb){
-                    
+
                     if(
-                        arguments.length > 0 && 
+                        arguments.length > 0 &&
                         (typeof(arguments[0]) !== "function" || arguments.length > 1)
                     ){
                         throw("cached function do not take any argument other than one callback");
@@ -154,12 +153,12 @@ define([
                             cb: cb
                         });
                     }
- 
+
                     return fn.call(this,function(err, res){
                         return this._setCache({
-                            fnName : key, 
-                            err : null, 
-                            callback : cb,
+                            fnName : key,
+                            err : null,
+                            cb : cb,
                             result : res
                         });
                     }.bind(this));
@@ -192,12 +191,12 @@ define([
             return previousObj;
         }
 
-        var extendObj = extendObjList.shift(), 
-            resObj = {}, 
-            nullFn = function(){}, 
+        var extendObj = extendObjList.shift(),
+            resObj = {},
+            nullFn = function(){},
             i, j, matchingRules = {}, isMatching;
-        
-        
+
+
 
 
         for (i in extendObj) if (extendObj.hasOwnProperty(i)) {
@@ -205,7 +204,7 @@ define([
 
             for(j = 0; j < extendRules.length; j++){
                 if(extendRules[j].match.test(i)){
-                    
+
                     isMatching = true;
 
                     //used to know if we need to extend using extendRules[j].extend
@@ -224,7 +223,7 @@ define([
             }
 
             if(!isMatching){
-               resObj[i] = extendObj[i]; 
+               resObj[i] = extendObj[i];
             }
         }
 
@@ -242,8 +241,8 @@ define([
     * Extend a Constructor with rules defined
     *
     * @public
-    * @param {Object} obj configuration key-value object with "+key" or "-key" 
-    * 
+    * @param {Object} obj configuration key-value object with "+key" or "-key"
+    *
     */
 
     Base.extend = function(obj) {

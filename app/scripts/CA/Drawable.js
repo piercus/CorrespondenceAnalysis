@@ -1,10 +1,10 @@
 define([
     "CA/Core",
-    "canvas/canvasCtx" 
-  ], function(Core, Canvas){
+    "canvas/canvasCtx"
+  ], function(Core, canvasCtx){
 
   var isArray = function(u){
-    return (typeof u === "object") && (typeof u.length === "number"); 
+    return (typeof u === "object") && (typeof u.length === "number");
   };
 
   var CADrawable = Core.extend({
@@ -12,10 +12,10 @@ define([
       size : 2000,
       font : null
     },
-    
+
     draw : function(cb){
-      var size = this.size, ctx = canvasCtx(size, size); 
-                  
+      var size = this.size, ctx = canvasCtx(size, size);
+
       ctx.font = this.font;
       ctx.beginPath();
       ctx.textAlign = 'center';
@@ -30,7 +30,7 @@ define([
       var step = size/2*0.8;
 
       this.getPoints(function(err, points){
-        
+
         if(err){
           return cb(err);
         }
@@ -41,8 +41,8 @@ define([
           ctx.fillText(points[i].label, px, py);
         }
 
-        cb();   
-             
+        cb();
+
       });
     }
   });

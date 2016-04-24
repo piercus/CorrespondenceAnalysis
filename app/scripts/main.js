@@ -1,3 +1,3 @@
 var requirejs = require("requirejs");
 require("./config.requirejs.js");
-module.exports = requirejs(["CA/CorrespondenceAnalysis"]);
+module.exports = requirejs("CA/Drawable");
