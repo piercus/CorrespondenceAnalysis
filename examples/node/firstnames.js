@@ -1,11 +1,12 @@
+var fs = require("fs");
 var CA = require("../../app/scripts/main.js");
 
-var ca = new CA();
+var ca = new CA({
+  filename : "out.png"
+});
 
-ca.rLegends = fs.read["Ain", "Aisne", "Allier", "Alpes de Hautes Provence", "Hautes Alpes"];
+ca.rLegends = ["Ain", "Aisne", "Allier", "Alpes de Hautes Provence", "Hautes Alpes"];
 ca.cLegends = ["Jean", "Philippe", "Michel","Alain","Patrick"];
-
-var data =
 
 ca.setMatrix([
   [55,73,90,13,16],

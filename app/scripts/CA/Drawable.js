@@ -10,11 +10,12 @@ define([
   var CADrawable = Core.extend({
     "+options" : {
       size : 2000,
-      font : null
+      font : null,
+      filename: "output.png"
     },
 
     draw : function(cb){
-      var size = this.size, ctx = canvasCtx(size, size);
+      var size = this.size, ctx = canvasCtx(size, size, this.filename);
 
       ctx.font = this.font;
       ctx.beginPath();
@@ -26,7 +27,7 @@ define([
       ctx.lineTo(0, size/2);
       ctx.lineTo(size, size/2);
       ctx.stroke();
-      //console.log("set Step");
+      console.log("set Step");
       var step = size/2*0.8;
 
       this.getPoints(function(err, points){
