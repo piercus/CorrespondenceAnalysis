@@ -9,7 +9,7 @@ requirejs.config({
     	"String" : "../../node_modules/String",
 			"canvas/canvasCtx" : "canvas/canvasCtx.node"
 	},
-	baseUrl: "app/scripts",
+	baseUrl: __dirname,
 	packages: [
 
 	],

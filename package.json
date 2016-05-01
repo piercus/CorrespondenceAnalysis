@@ -1,10 +1,11 @@
 {
   "name": "CorrespondenceAnalysis",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Correspondence analysis implementation in javascript, works on server-side and client-side.",
   "main": "app/scripts/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "bower install"
   },
   "dependencies": {
     "Array": "git://github.com/piercus/Array.git#master",
